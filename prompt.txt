@@ -1,0 +1,1 @@
+Extract from this image the information such as the date, the invoice amount, currency, the merchant's name and another essentials informations , and return these details in JSON format
