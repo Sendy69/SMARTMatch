@@ -36,7 +36,7 @@ def extract(image_path):
             "content": [
                 {
                     "type": "text",
-                    "text": "You are a chartered accountant, and the information must be in the following format: Date: YYYY-MM-DD , Amount: return example (20.8 if the amount contains commas),Merchant: in lowercase, Currency(if it exist and null if not exist)"
+                    "text": "You are a chartered accountant, and the information must be in the following format: Date: DD/MM/YYYY , Amount: return example (20.8 if the amount contains commas),Merchant: in lowercase, Currency(if it exist and null if not exist)"
                 } 
             ],
 
