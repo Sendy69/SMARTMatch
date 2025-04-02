@@ -11,6 +11,7 @@ from sentence_transformers import SentenceTransformer, util
 
 MODEL_EMBEDED = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
+receipts = pd.read_csv("../../receipts/data_cleaned.csv")
 
 
 def matching_func(bank_statement_path, receipts):
@@ -20,28 +21,28 @@ def matching_func(bank_statement_path, receipts):
 
     for i, receipt in receipts.iterrows():
         # 1. Filtrer les lignes avec le même montant
-        matches_amount = df_bank_statement_copy[df_bank_statement_copy["amount"] == receipt["amount"]]
+        matches_amount = df_bank_statement_copy[df_bank_statement_copy["amount"] == receipt["total_amount"]]
 
         if not matches_amount.empty:
             if len(matches_amount) == 1:
                 index = matches_amount.index[0]
-                df_bank_statement_copy.at[index, "receipt"] = receipt["filename"]
+                df_bank_statement_copy.at[index, "receipt"] = receipt["id_invoice"]
                 continue
 
             # 2. Affiner avec la date
-            matches_date = matches_amount[matches_amount["date"] == receipt["date"]]
+            matches_date = matches_amount[matches_amount["date"] == receipt["invoice_date_clean"]]
 
             if len(matches_date) == 1:
                 index = matches_date.index[0]
-                df_bank_statement_copy.at[index, "receipt"] = receipt["filename"]
+                df_bank_statement_copy.at[index, "receipt"] = receipt["id_invoice"]
                 continue
 
             # 3. Si plusieurs lignes encore : fuzzy matching sur nom du marchand
             subset = matches_date if not matches_date.empty else matches_amount
 
-            receipt_name = receipt.get("merchant_name", "")
-            receipt_address = receipt.get("address", "")
-            vendor_receipt = receipt_name + " " + receipt_address if receipt_address else receipt_name
+            receipt_vendor_name = receipt.get("supplier_name_clean", "")
+            receipt_vendor_address = receipt.get("address", "")
+            vendor_receipt = receipt_vendor_name + " " + receipt_vendor_address if receipt_vendor_address else receipt_vendor_name
 
             if not vendor_receipt.strip():
                 continue  # Pas d'infos pour matcher
@@ -58,7 +59,7 @@ def matching_func(bank_statement_path, receipts):
             if similarities:
                 best_index, best_score = max(similarities, key=lambda x: x[1])
                 if best_score > 0.75:
-                    df_bank_statement_copy.at[best_index, "receipt"] = receipt["filename"]
+                    df_bank_statement_copy.at[best_index, "receipt"] = receipt["id_invoice"]
 
     return df_bank_statement_copy
  
@@ -68,12 +69,12 @@ def matching_func(bank_statement_path, receipts):
 
 
 
-results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
+#results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
 
-receipts = parse_json_to_dataframe(results)
+#receipts = parse_json_to_dataframe(results)
 
-print(type(receipts))
-print(receipts.info())
+# print(type(receipts))
+# print(receipts.info())
 
 df_matched = matching_func(BANK_STATEMENT_PATH, receipts)
 
@@ -85,3 +86,4 @@ print("##########################")
 print(df_matched.head(10))
 
 
+#print(df_bank_statement)
