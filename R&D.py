@@ -91,6 +91,7 @@ def process_images():
                 general_info = {field["name"]: field["value"] for field in result["fields"] if field["name"] != "Items"}
             if general_info:
                 df_general = pd.DataFrame([general_info])
+                df_general["filename"] = image_path
                 all_dataframes.append(df_general)
             else:
                 print(f"⚠️ Données invalides ou manquantes pour {filename}")
