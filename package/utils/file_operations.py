@@ -37,6 +37,8 @@ def get_encoded_images(folder_path):
 ### Fonction pour recupérer un relevé de compte et le convertir en csv
 def get_bank_statement(bank_statement_path):
     df = pd.read_csv(bank_statement_path)
+    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d", errors='coerce')
+    
     return df
 
 def get_context(context_path):
@@ -55,3 +57,6 @@ context_path = "../../context.txt"
 #print(get_context(context_path))
 #print(get_bank_statement("../../releve_04.csv"))
 #print(get_encoded_images(folder_path))
+
+df = get_bank_statement("../../releve_04.csv")
+df.info()
