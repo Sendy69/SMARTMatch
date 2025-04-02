@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+from config import API_KEY, MODEL, CLIENT, CONTEXT_PATH, PROMPT_PATH, IMAGES_PATH
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
@@ -11,13 +12,7 @@ from mistralai import Mistral
 import requests
 
 
-load_dotenv()
-api_key = os.environ["MISTRAL_KEY"]
-model = "pixtral-12b-2409"
-client = Mistral(api_key=api_key)
-context_path = "../../context.txt"
-prompt_path = "../../prompt.txt"
-images_path = "../../receipts"
+
 
 
 def analyzed_receipts(images_path, context_path, prompt_path, model, client):
@@ -92,9 +87,12 @@ def parse_json_to_dataframe(results_of_mistral):
             
         })
     
-    return pd.DataFrame(list_of_result)
+    df =  pd.DataFrame(list_of_result)
+    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d", errors='coerce')
+    df["amount"] = pd.to_numeric(df["amount"], errors='coerce')
+    return df
 
 
-results = analyzed_receipts(images_path, context_path, prompt_path, model, client )
+results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT )
 
 print(parse_json_to_dataframe(results))
