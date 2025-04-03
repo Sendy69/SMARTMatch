@@ -10,3 +10,4 @@ CONTEXT_PATH = "../../context.txt"
 PROMPT_PATH = "../../prompt.txt"
 IMAGES_PATH = "../../receipts"
 BANK_STATEMENT_PATH = "../../releve_01.csv"
+

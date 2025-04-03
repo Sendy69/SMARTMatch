@@ -14,11 +14,7 @@ import zipfile
 import re
 import sys
 import uuid
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from package.utils.file_operations import *
-from package.utils.mistral_model import *
-from package.utils.matching import *
-from package.utils.config import *
+
 
 # Configuration de la page
 st.set_page_config(layout="wide", page_title="SMARTMatch", page_icon=":moneybag:")
@@ -221,6 +217,7 @@ with col1:
             # Ajouter à la liste existante
             st.session_state.receipts_files.extend(receipt_files)
             st.success(f"{len(receipt_files)} reçus chargés!")
+            receipts_df = pd.DataFrame(receipt_files, columns=["Fichiers de reçus"])
         
         # Traitement du zip
         if uploaded_zip:
@@ -251,9 +248,13 @@ with col1:
     with st.container():
         st.markdown("##")  # Espacement
         if st.button("Exécuter mapping de reçu", key="execute_mapping", type="primary", use_container_width=True):
-            success = execute_mapping()
-    
-    # Zone pour l'exportation CSV uniquement
+            results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
+
+            receipts = parse_json_to_dataframe(results)
+            success = matching_func(path, receipts)
+            print(success)
+            
+                    # Zone pour l'exportation CSV uniquement
     with st.container():
         st.subheader("Exporter les résultats")
         if st.button("Exporter en CSV", use_container_width=True):

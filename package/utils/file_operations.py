@@ -2,6 +2,7 @@ import os
 import base64
 import pandas as pd
 import sys
+import zipfile
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -34,6 +35,8 @@ def get_encoded_images(folder_path):
                 })
     return images_encoded
 
+
+
 ### Fonction pour recupérer un relevé de compte et le convertir en csv
 def get_bank_statement(bank_statement_path):
     df = pd.read_csv(bank_statement_path)
@@ -50,6 +53,19 @@ def get_prompt(prompt_path):
     with open(prompt_path, 'r', encoding='utf-8') as file:
         context = file.read()
     return context
+
+#Fonction pour traiter une archive ZIP contenant des images
+def process_zip_directory(zip_file):
+    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+        # Extraire uniquement les fichiers images
+        image_files = [f for f in zip_ref.namelist() if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        
+        # Extraire les images
+        for img_file in image_files:
+            zip_ref.extract(img_file, st.session_state.receipts_dir)
+        
+        # Retourner les chemins complets des images extraites
+        return [os.path.join(st.session_state.receipts_dir, img_file) for img_file in image_files]
 
 folder_path = "../../receipts"
 context_path = "../../context.txt"

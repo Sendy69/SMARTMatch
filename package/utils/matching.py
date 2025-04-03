@@ -6,8 +6,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 
 from package.utils.mistral_model import *
 from package.utils.file_operations import get_bank_statement
-from config import *
+from package.utils.config import *
 from sentence_transformers import SentenceTransformer, util
+from datetime import timedelta
+import openpyxl
 
 MODEL_EMBEDED = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
@@ -18,6 +20,9 @@ def matching_func(bank_statement_path, receipts):
     df_bank_statement = get_bank_statement(bank_statement_path)
     df_bank_statement_copy = df_bank_statement.copy()
     df_bank_statement_copy["receipt"] = None  # Colonne pour lier les reçus
+    tolerance_days = 2
+    similarities = 0.75
+    
 
     for i, receipt in receipts.iterrows():
         # 1. Filtrer les lignes avec le même montant
@@ -30,7 +35,7 @@ def matching_func(bank_statement_path, receipts):
                 continue
 
             # 2. Affiner avec la date
-            matches_date = matches_amount[matches_amount["date"] == receipt["invoice_date_clean"]]
+            matches_date = matches_amount[matches_amount["date"] == receipt["invoice_date_clean"]] or matches_amount[matches_amount["date"] + timedelta(tolerance_days) == receipt["invoice_date_clean"]]
 
             if len(matches_date) == 1:
                 index = matches_date.index[0]
@@ -58,7 +63,7 @@ def matching_func(bank_statement_path, receipts):
 
             if similarities:
                 best_index, best_score = max(similarities, key=lambda x: x[1])
-                if best_score > 0.75:
+                if best_score > similarities:
                     df_bank_statement_copy.at[best_index, "receipt"] = receipt["id_invoice"]
 
     return df_bank_statement_copy
@@ -69,9 +74,9 @@ def matching_func(bank_statement_path, receipts):
 
 
 
-#results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
+results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
 
-#receipts = parse_json_to_dataframe(results)
+receipts = parse_json_to_dataframe(results)
 
 # print(type(receipts))
 # print(receipts.info())

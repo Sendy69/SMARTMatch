@@ -1,11 +1,12 @@
 import sys
 import os
 import json
-from config import API_KEY, MODEL, CLIENT, CONTEXT_PATH, PROMPT_PATH, IMAGES_PATH
+
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from package.utils.file_operations import *
+from package.utils.config import *
 from dotenv import load_dotenv
 import os
 from mistralai import Mistral
@@ -56,12 +57,12 @@ def analyzed_receipts(images_path, context_path, prompt_path, model, client):
             json_data = json.loads(chat_response.choices[0].message.content)
 
             result = {
-                "filename": image["filename"],
-                "date": json_data.get("date"),
-                "amount": json_data.get("amount"),
+                "id_invoice": image["filename"],
+                "invoice_date_clean": json_data.get("date"),
+                "total_amount": json_data.get("amount"),
                 "currency": json_data.get("currency"),
-                "merchant_name": json_data.get("merchant_name"),
-                "merchant_address": json_data.get("merchant_address")
+                "supplier_name_clean": json_data.get("merchant_name"),
+                "address": json_data.get("merchant_address")
             }
 
         except Exception as e:

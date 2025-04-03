@@ -8,17 +8,7 @@ load_dotenv()
 api_key = os.environ["MISTRAL_KEY"]
 
 
-def encode_image(image_path):
-    """Encode the image to base64."""
-    try:
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-    except FileNotFoundError:
-        print(f"Error: The file {image_path} was not found.")
-        return None
-    except Exception as e:  # Added general exception handling
-        print(f"Error: {e}")
-        return None
+
 
 
 
@@ -82,7 +72,8 @@ messages = [
 # Get the chat response
 chat_response = client.chat.complete(
     model=model,
-    messages=messages
+    messages=messages,
+    response
 )
 
 # Print the content of the response
