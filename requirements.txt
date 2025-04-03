@@ -6,5 +6,4 @@ pandas
 sentence-transformers
 pillow
 openpyxl
-numpy
 zipfile
