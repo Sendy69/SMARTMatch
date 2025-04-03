@@ -1,3 +1,10 @@
 python-dotenv
 mistralai
 pybase64
+streamlit 
+pandas
+sentence-transformers
+pillow
+openpyxl
+numpy
+zipfile
