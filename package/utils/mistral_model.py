@@ -95,4 +95,4 @@ def parse_json_to_dataframe(results_of_mistral):
 
 results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT )
 
-print(parse_json_to_dataframe(results))
+#print(parse_json_to_dataframe(results))
