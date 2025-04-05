@@ -1,5 +1,6 @@
 from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, confusion_matrix
 import pandas as pd
+import re
 import seaborn as sns
 import matplotlib.pyplot as plt
 
