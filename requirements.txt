@@ -1,0 +1,10 @@
+python-dotenv
+mistralai
+pybase64
+streamlit 
+pandas
+sentence-transformers
+pillow
+numpy
+openpyxl
+
