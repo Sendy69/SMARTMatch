@@ -13,10 +13,10 @@ import openpyxl
 
 MODEL_EMBEDED = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-receipts = pd.read_csv("../../receipts/data_cleaned.csv")
+# receipts = pd.read_csv("../../receipts/data_cleaned.csv")
 
 
-def matching_func(bank_statement_path, receipts):
+def matching_func_1(bank_statement_path, receipts):
     df_bank_statement = get_bank_statement(bank_statement_path)
     df_bank_statement_copy = df_bank_statement.copy()
     df_bank_statement_copy["receipt"] = None  # Colonne pour lier les reçus
@@ -25,7 +25,7 @@ def matching_func(bank_statement_path, receipts):
     
 
     for i, receipt in receipts.iterrows():
-        # 1. Filtrer les lignes avec le même montant
+        #  Filtrer les lignes avec le même montant
         matches_amount = df_bank_statement_copy[df_bank_statement_copy["amount"] == receipt["total_amount"]]
 
         if not matches_amount.empty:
@@ -34,7 +34,7 @@ def matching_func(bank_statement_path, receipts):
                 df_bank_statement_copy.at[index, "receipt"] = receipt["id_invoice"]
                 continue
 
-            # 2. Affiner avec la date
+            #  Affiner avec la date
             matches_date = matches_amount[matches_amount["date"] == receipt["invoice_date_clean"]] or matches_amount[matches_amount["date"] + timedelta(tolerance_days) == receipt["invoice_date_clean"]]
 
             if len(matches_date) == 1:
@@ -42,7 +42,7 @@ def matching_func(bank_statement_path, receipts):
                 df_bank_statement_copy.at[index, "receipt"] = receipt["id_invoice"]
                 continue
 
-            # 3. Si plusieurs lignes encore : fuzzy matching sur nom du marchand
+            #  Si plusieurs lignes encore : fuzzy matching sur nom du marchand
             subset = matches_date if not matches_date.empty else matches_amount
 
             receipt_vendor_name = receipt.get("supplier_name_clean", "")
@@ -74,21 +74,21 @@ def matching_func(bank_statement_path, receipts):
 
 
 
-results = analyzed_receipts(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
+# results = extracted_data_receipt(IMAGES_PATH, CONTEXT_PATH, PROMPT_PATH, MODEL, CLIENT)
 
-receipts = parse_json_to_dataframe(results)
+# receipts = parse_json_to_dataframe(results)
 
-# print(type(receipts))
-# print(receipts.info())
+# # print(type(receipts))
+# # print(receipts.info())
 
-df_matched = matching_func(BANK_STATEMENT_PATH, receipts)
+# df_matched = matching_func(BANK_STATEMENT_PATH, receipts)
 
 
-print(df_matched)
-print(df_matched.info())
-print("##########################")
-print("##########################")
-print(df_matched.head(10))
+# print(df_matched)
+# print(df_matched.info())
+# print("##########################")
+# print("##########################")
+# print(df_matched.head(10))
 
 
 #print(df_bank_statement)

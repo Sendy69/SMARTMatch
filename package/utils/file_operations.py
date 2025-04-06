@@ -3,6 +3,7 @@ import base64
 import pandas as pd
 import sys
 import zipfile
+import streamlit as st
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -22,17 +23,18 @@ def encode_image(image_path):
         return None
 
 ### Fonction pour lire et encoder toutes les images d'un repertoire
-def get_encoded_images(folder_path):
+def get_encoded_images(list_of_path_images):
     images_encoded = []
-    for filename in os.listdir(folder_path):
-        if filename.lower().endswith('.jpeg') or filename.lower().endswith('.jpg'):
-            path = os.path.join(folder_path, filename)
-            with open(path, 'rb') as f:
+    for path in list_of_path_images:
+        if path.lower().endswith(('.jpeg', '.jpg', '.png')) and os.path.isfile(path):
+            try:
                 encoded = encode_image(path)
                 images_encoded.append({
-                    "filename": filename,
+                    "filename": os.path.basename(path),
                     "content_base64": encoded
                 })
+            except Exception as e:
+                print(f"Erreur d'encodage pour {path} : {e}")
     return images_encoded
 
 
@@ -67,12 +69,12 @@ def process_zip_directory(zip_file):
         # Retourner les chemins complets des images extraites
         return [os.path.join(st.session_state.receipts_dir, img_file) for img_file in image_files]
 
-folder_path = "../../receipts"
-context_path = "../../context.txt"
+# list_of_path_images = "../../receipts"
+# context_path = "../../context.txt"
 
 #print(get_context(context_path))
 #print(get_bank_statement("../../releve_04.csv"))
 #print(get_encoded_images(folder_path))
 
-df = get_bank_statement("../../releve_04.csv")
-df.info()
+# df = get_bank_statement("../../releve_04.csv")
+# df.info()
